@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build",
