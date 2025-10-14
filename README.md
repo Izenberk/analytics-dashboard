@@ -7,7 +7,6 @@
 
 > A modern, professional analytics dashboard built with Next.js 15, TypeScript, and Material-UI. Features real-time data visualization, responsive design, and a comprehensive component library.
 
-![Dashboard Preview](https://via.placeholder.com/800x400/1976d2/ffffff?text=Analytics+Dashboard+Preview)
 
 ## ✨ Features
 
@@ -276,3 +275,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ using modern web technologies**
+
