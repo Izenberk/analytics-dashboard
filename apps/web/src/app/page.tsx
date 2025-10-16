@@ -86,10 +86,10 @@ export default function HomePage() {
               Frontend Stack
             </Typography>
             <Typography variant="body2" paragraph>
-              • Next.js 14 with App Router<br/>
+              • Next.js with App Router for performance<br/>
               • TypeScript for type safety<br/>
-              • Material-UI v5 component system<br/>
-              • Recharts for data visualization
+              • Material-UI component system<br/>
+              • Recharts for interactive data visualization
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
@@ -97,8 +97,8 @@ export default function HomePage() {
               Architecture Patterns
             </Typography>
             <Typography variant="body2" paragraph>
-              • Clean architecture separation<br/>
-              • Discriminated unions for type safety<br/>
+              • Clean architecture with separation of concerns<br/>
+              • Type-safe component APIs<br/>
               • Centralized utility functions<br/>
               • Professional component composition
             </Typography>
