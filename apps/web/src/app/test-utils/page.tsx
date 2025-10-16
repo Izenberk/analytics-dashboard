@@ -2,13 +2,9 @@
 
 import { Container, Typography, Box, Grid, Divider } from '@mui/material';
 import {
-  TrendingUp,
-  AttachMoney,
   People,
-  ShoppingCart,
   Timeline,
   ShowChart,
-  BarChart,
 } from '@mui/icons-material';
 import { calculateTrend } from "@/lib/trend-calculator"
 import { MetricCard } from '@/components/ui/MetricCard'
