@@ -39,7 +39,7 @@ export default function TestUtilsPage() {
                 value={metric.value}
                 previousValue={metric.previousValue}
                 format={metric.format}
-                icon={<metric.icon />}
+                icon={metric.icon}
                 trend={metric.trend}
               />
             </Grid>

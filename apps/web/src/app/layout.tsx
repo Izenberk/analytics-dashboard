@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Analytics Dashboard",
-  description: "Professional analytics dashboard built with Next.js and MUI",
+  title: 'Analytics Dashboard - Professional React Components',
+  description: 'Modern analytics dashboard built with Next.js, TypeScript, and Material-UI. Demonstrating clean architecture and professional component design patterns.',
 };
 
 export default function RootLayout({

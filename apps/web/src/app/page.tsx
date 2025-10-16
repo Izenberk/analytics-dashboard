@@ -9,102 +9,102 @@
  * 3. MUI components need browser context for styling
  */
 
-import { Typography, Container, Box, Stack } from "@mui/material";
-import { AnalyticsButton } from '@/components/ui/AnalyticsButton';
+import { Typography, Container, Box, Stack, Button, Paper, Grid } from "@mui/material";
 import {
-  Dashboard,
-  TrendingUp,
-  PieChart,
-  BarChart,
-  Timeline,
+  Dashboard as DashboardIcon,
+  Code as CodeIcon
 } from '@mui/icons-material';
+import Link from 'next/link';
+import { MetricCard } from '@/components/ui/MetricCard';
+import { mockMetrics } from "@/lib/mock-data";
 
-export default function Home() {
-  // Event handlers for our buttons (professional practice)
-  const handleDashboardClick = () => {
-    console.log('Dashboard clicked');
-  };
-
-  const handleGrowthClick = () => {
-    console.log('Growth metrics clicked');
-  };
-
-  const handleChartsClick = () => {
-    console.log('Charts view clicked');
-  };
-
+export default function HomePage() {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box textAlign="center" mb={6}>
-        <Typography variant="h1" component="h1" gutterBottom color="primary">
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Box sx={{textAlign:"center", mb: 6}} >
+        <Typography variant="h2" component="h1" gutterBottom>
           Analytics Dashboard
         </Typography>
-        <Typography variant="h5" component="p" color="text.secondary" mb={4}>
-          Professional analytics dashboard build with Next.js and MUI
+        <Typography variant="h5" component="p" color="text.secondary" paragraph>
+          Professional React Component Library
         </Typography>
-      </Box>
-
-      {/* Test our AnalyticsButton component */}
-      <Box mb={6}>
-        <Typography variant="h3" gutterBottom>
-          🔘 Testing Our Analytics Buttons
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Clean architecture • TypeScript • Material-UI • Recharts
         </Typography>
 
-        <Stack direction="row" spacing={2} flexWrap="wrap" gap={2}>
-          <AnalyticsButton
-            analyticsType="primary"
-            startIcon={<Dashboard />}
-            onClick={handleDashboardClick}
+        <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 4}}>
+          <Button
+            component={Link}
+            href="/test-utils"
+            variant="contained"
+            size="large"
+            startIcon={<CodeIcon />}
           >
-            Dashboard
-          </AnalyticsButton>
-
-          <AnalyticsButton
-            analyticsType="success"
-            startIcon={<TrendingUp />}
-            onClick={handleGrowthClick}
-          >
-            Growth +12%
-          </AnalyticsButton>
-
-          <AnalyticsButton
-            analyticsType="warning"
+            View Components
+          </Button>
+          <Button
             variant="outlined"
-            startIcon={<PieChart />}
-            onClick={handleChartsClick}
+            size="large"
+            startIcon={<DashboardIcon />}
+            disabled
           >
-            View Charts
-          </AnalyticsButton>
-
-          <AnalyticsButton
-            analyticsType="error"
-            variant="text"
-            startIcon={<BarChart />}
-          >
-            Critical Alert
-          </AnalyticsButton>
-
-          <AnalyticsButton
-            loading
-            analyticsType="secondary"
-            startIcon={<Timeline />}
-          >
-            Fetching Data
-          </AnalyticsButton>
+            Dashboard (Coming Soon)
+          </Button>
         </Stack>
       </Box>
 
-      {/* Test MUI Typography */}
-      <Box mb={4}>
-        <Typography variant="h3" gutterBottom>
-          📊 Dashboard Preview
+      {/* Component Preview */}
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h4" gutterBottom align="center">
+          Component Library Preview
         </Typography>
-        <Typography variant="body1" paragraph>
-          This is our analytics dashboard built with professional tools and practices.
-          We&apos;re using MUI for consistent, accessible components and our custom theme
-          for analytics-specific styling.
-        </Typography>
+
+        <Grid container spacing={3} sx={{ flexGrow: 1, mt: 2 }}>
+          {mockMetrics.slice(0, 4).map((metric, index) => (
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
+              <MetricCard
+                title={metric.title}
+                value={metric.value}
+                previousValue={metric.previousValue}
+                format={metric.format}
+                icon={metric.icon}
+                trend={metric.trend}
+              />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
+
+      {/* Technical Details */}
+      <Paper sx={{ p: 4, bgcolor: 'background.default' }}>
+        <Typography variant="h5" gutterBottom>
+          Technical Architecture
+        </Typography>
+        <Grid container spacing={3} sx={{ flexGrow: 1 }}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography variant="h6" color="primary" gutterBottom>
+              Frontend Stack
+            </Typography>
+            <Typography variant="body2" paragraph>
+              • Next.js 14 with App Router<br/>
+              • TypeScript for type safety<br/>
+              • Material-UI v5 component system<br/>
+              • Recharts for data visualization
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography variant="h6" color="primary" gutterBottom>
+              Architecture Patterns
+            </Typography>
+            <Typography variant="body2" paragraph>
+              • Clean architecture separation<br/>
+              • Discriminated unions for type safety<br/>
+              • Centralized utility functions<br/>
+              • Professional component composition
+            </Typography>
+          </Grid>
+        </Grid>
+      </Paper>
     </Container>
   );
 }
