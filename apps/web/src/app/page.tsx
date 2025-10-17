@@ -43,12 +43,13 @@ export default function HomePage() {
             View Components
           </Button>
           <Button
-            variant="outlined"
+            component={Link}
+            href="/dashboard"
+            variant="contained"
             size="large"
             startIcon={<DashboardIcon />}
-            disabled
           >
-            Dashboard (Coming Soon)
+            View Dashboard
           </Button>
         </Stack>
       </Box>
