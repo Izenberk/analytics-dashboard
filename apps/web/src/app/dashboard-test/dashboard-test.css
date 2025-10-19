@@ -1,0 +1,464 @@
+/* ================================================================
+   PROFESSIONAL DASHBOARD TEST STYLES - ACCESSIBILITY ENHANCED
+   
+   Learning Focus: WCAG AA compliant design system
+   Architecture: High contrast, readable, inclusive design
+   Standards: Professional accessibility requirements met
+   ================================================================ */
+
+/* ================================================================
+   1. ENHANCED CSS CUSTOM PROPERTIES (Accessible Design System)
+   ================================================================ */
+
+:root {
+  /* Professional: WCAG AA compliant primary colors */
+  --color-primary: #1d4ed8;      /* Enhanced: Higher contrast blue */
+  --color-secondary: #6d28d9;    /* Enhanced: Higher contrast purple */
+  --color-success: #047857;      /* Enhanced: Higher contrast green */
+  --color-warning: #b45309;      /* Enhanced: Higher contrast orange */
+  --color-danger: #b91c1c;       /* Enhanced: Higher contrast red */
+  
+  /* Professional: Enhanced neutral palette with guaranteed contrast */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;     /* Added: Mid-range gray */
+  --color-gray-500: #6b7280;     /* Enhanced: Better contrast */
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  /* Professional: Accessible widget background system */
+  --widget-bg-light: #ffffff;                    /* Light theme widgets */
+  --widget-bg-dark: var(--color-gray-800);      /* Dark theme widgets */
+  --widget-text-on-light: var(--color-gray-900); /* High contrast text on light */
+  --widget-text-on-dark: #ffffff;               /* High contrast text on dark */
+  --widget-text-secondary: var(--color-gray-600); /* Secondary text */
+  
+  /* Professional: Enhanced testing state colors */
+  --color-test-pending: #d97706;    /* Enhanced: Better contrast */
+  --color-test-running: #2563eb;    /* Enhanced: Better contrast */
+  --color-test-success: #059669;    /* Enhanced: Better contrast */
+  --color-test-failure: #dc2626;    /* Enhanced: Better contrast */
+  
+  /* Professional: Accessible interaction states */
+  --color-focus: #2563eb;
+  --color-hover: #1d4ed8;
+  --color-active: #1e40af;
+  
+  /* Professional: Enhanced shadows for better definition */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  
+  /* Professional: Consistent spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  /* Professional: Enhanced typography scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  
+  /* Professional: Font weight system */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+}
+
+/* ================================================================
+   2. ENHANCED GLOBAL STYLES AND ACCESSIBILITY
+   ================================================================ */
+
+/* Professional: Enhanced focus management for accessibility */
+*:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Professional: Enhanced skip navigation */
+.skip-nav {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--color-gray-900);
+  color: white;
+  padding: var(--space-sm) var(--space-md);
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  border: 2px solid transparent;
+}
+
+.skip-nav:focus {
+  top: 6px;
+  border-color: var(--color-focus);
+}
+
+/* Professional: Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ================================================================
+   3. ENHANCED LAYOUT COMPONENTS
+   ================================================================ */
+
+/* Professional: Enhanced main page container */
+.dashboard-test-page {
+  min-height: 100vh;
+  background: var(--color-gray-50);
+  padding: var(--space-md);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: var(--color-gray-900); /* Enhanced: Explicit text color */
+}
+
+/* Professional: Enhanced responsive grid layout */
+.dashboard-test-grid {
+  display: grid;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  
+  /* Mobile-first: Single column */
+  grid-template-columns: 1fr;
+  grid-template-areas: 
+    "test-1"
+    "test-2" 
+    "test-3"
+    "test-4";
+}
+
+/* Tablet layout: 2 columns */
+@media (min-width: 768px) {
+  .dashboard-test-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+      "test-1 test-2"
+      "test-3 test-4";
+  }
+}
+
+/* Desktop layout: 4 columns */
+@media (min-width: 1200px) {
+  .dashboard-test-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: "test-1 test-2 test-3 test-4";
+  }
+}
+
+/* ================================================================
+   4. ENHANCED HEADER COMPONENTS
+   ================================================================ */
+
+.test-page-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  padding: var(--space-xl);
+  background: var(--widget-bg-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--color-primary);
+}
+
+.test-page-header h1 {
+  color: var(--widget-text-on-light);
+  margin-bottom: var(--space-sm);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  line-height: 1.2;
+}
+
+.test-page-header p {
+  color: var(--widget-text-secondary);
+  font-size: var(--text-lg);
+  margin-bottom: 0;
+  font-weight: var(--font-medium);
+}
+
+/* ================================================================
+   5. ENHANCED INSTRUCTION COMPONENTS
+   ================================================================ */
+
+.test-instructions {
+  margin: var(--space-lg) auto;
+  text-align: left;
+  max-width: 700px;
+  padding: var(--space-lg);
+  background: var(--widget-bg-light);
+  border-radius: 8px;
+  border: 1px solid var(--color-gray-200);
+  border-left: 3px solid var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.test-instructions h3 {
+  color: var(--widget-text-on-light);
+  margin-bottom: var(--space-md);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.test-instructions ul {
+  color: var(--widget-text-secondary);
+  margin: 0;
+  padding-left: var(--space-lg);
+  list-style: none;
+}
+
+.test-instructions li {
+  margin-bottom: var(--space-sm);
+  position: relative;
+  font-weight: var(--font-medium);
+  color: var(--color-gray-700); /* Enhanced: Better contrast */
+}
+
+/* Professional: Enhanced accessible status indicators */
+.test-instructions li::before {
+  content: "⏳";
+  position: absolute;
+  left: -1.5rem;
+  font-size: var(--text-sm);
+}
+
+.test-instructions li.completed::before {
+  content: "✅";
+}
+
+.test-instructions li.failed::before {
+  content: "❌";
+}
+
+/* ================================================================
+   6. ENHANCED WIDGET COMPONENTS - ACCESSIBILITY FOCUSED
+   ================================================================ */
+
+/* Professional: Enhanced base widget styling with high contrast */
+.metric-display,
+.chart-display {
+  background: var(--widget-bg-light) !important;
+  color: var(--widget-text-on-light) !important;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+/* Professional: Enhanced metric display styling */
+.metric-display {
+  padding: var(--space-lg);
+  height: 100%;
+}
+
+.metric-display h3,
+.metric-display p,
+.metric-display div {
+  color: var(--widget-text-on-light) !important;
+}
+
+/* Professional: Enhanced chart display styling */
+.chart-display {
+  padding: var(--space-lg);
+  height: 100%;
+}
+
+.chart-display h3,
+.chart-display p,
+.chart-display div {
+  color: var(--widget-text-on-light) !important;
+}
+
+/* Professional: Ensure chart text is visible */
+.chart-display .recharts-text {
+  fill: var(--widget-text-on-light) !important;
+}
+
+.chart-display .recharts-cartesian-axis-tick-value {
+  fill: var(--color-gray-600) !important;
+}
+
+/* ================================================================
+   7. ENHANCED TESTING STATE INDICATORS
+   ================================================================ */
+
+/* Professional: Enhanced visual test status indicator */
+.test-widget-content::before {
+  content: "";
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-gray-300);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.test-widget-content.test-pending::before {
+  background: var(--color-test-pending);
+  animation: pulse 2s infinite;
+}
+
+.test-widget-content.test-running::before {
+  background: var(--color-test-running);
+  animation: spin 1s linear infinite;
+}
+
+.test-widget-content.test-success::before {
+  background: var(--color-test-success);
+}
+
+.test-widget-content.test-failure::before {
+  background: var(--color-test-failure);
+  animation: shake 0.5s ease-in-out;
+}
+
+/* ================================================================
+   8. ANIMATIONS
+   ================================================================ */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+/* ================================================================
+   9. ENHANCED CONTENT AREAS
+   ================================================================ */
+
+.test-features {
+  margin: var(--space-md) 0;
+  padding: var(--space-md);
+  background: var(--color-gray-100);
+  border-radius: 6px;
+  border: 1px solid var(--color-gray-200);
+}
+
+.test-features p {
+  margin: var(--space-xs) 0;
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-gray-700);
+  font-weight: var(--font-medium);
+}
+
+.test-status {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.status-item {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  border: 1px solid var(--color-gray-200);
+  transition: all 0.2s ease;
+}
+
+.status-item:hover {
+  background: var(--color-gray-200);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ================================================================
+   10. ENHANCED FOOTER COMPONENTS
+   ================================================================ */
+
+.test-page-footer {
+  text-align: center;
+  padding: var(--space-xl);
+  background: var(--widget-bg-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  border-top: 4px solid var(--color-success);
+}
+
+.test-summary {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.test-summary h3 {
+  color: var(--widget-text-on-light);
+  margin-bottom: var(--space-md);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+}
+
+.test-summary h4 {
+  color: var(--widget-text-on-light);
+  margin: var(--space-md) 0 var(--space-sm) 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+}
+
+.test-summary ol,
+.test-summary ul {
+  color: var(--color-gray-700);
+  line-height: 1.7;
+  padding-left: var(--space-lg);
+}
+
+.test-summary li {
+  margin-bottom: var(--space-sm);
+  font-weight: var(--font-medium);
+}
+
+.test-summary p {
+  color: var(--color-gray-700);
+  font-weight: var(--font-medium);
+}
+
+/* Professional: Enhanced div styling in summary */
+.test-summary div {
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-left: 3px solid var(--color-success);
+  border-radius: 8px;
+  padding: var(--space-lg);
+  margin-top: var(--space-lg);
+}
