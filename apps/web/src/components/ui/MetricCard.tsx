@@ -19,6 +19,8 @@ import { SxProps, Theme } from "@mui/material";
 
 import { calculateTrend, TrendCalculation } from "@/lib/trend-calculator";
 import { formatNumber, formatCurrency } from "@/lib/utils";
+import { WidgetActionCallbacks } from "@/types/widget-actions";
+import { WidgetActions } from "./WidgetActions";
 
 /**
  * MetricCard Props Interface
@@ -32,6 +34,8 @@ type MetricCardProps = {
   size?: 'small' | 'medium' | 'large';
   icon?: React.ReactNode;
   sx?: SxProps<Theme>;
+  actions?: WidgetActionCallbacks;
+  widgetId?: string;
 } & (
   | {
       format: 'currency';
@@ -48,7 +52,7 @@ type MetricCardProps = {
 );
 
 /**
- * Professional MetricCard Component
+ * MetricCard Component
  *
  * Features:
  * - Type-safe format handling
@@ -66,7 +70,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   trend = 'auto',
   size = 'medium',
   icon,
-  sx
+  sx,
+  actions,
+  widgetId
 }) => {
   // Computed values using useMemo for performance
   const trendData = React.useMemo((): TrendCalculation | null => {
@@ -157,7 +163,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     >
       <CardContent>
         <Stack spacing={2} height="100%">
-          {/* Header Section - Title and Icon */}
+          {/* Header Section - Title, Icon, and Actions */}
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
             <Typography
               variant="h6"
@@ -171,16 +177,33 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               {title}
             </Typography>
 
-            {icon && (
-              <Box
-                sx={{
-                  color: 'primary.main',
-                  '& > *': { fontSize: size === 'small' ? 20 : 24 }
-                }}
-              >
-                {icon}
-              </Box>
-            )}
+            {/* Right section with icon and actions */}
+            <Stack direction="row" spacing={1} alignItems="center">
+              {icon && (
+                <Box
+                  sx={{
+                    color: 'primary.main',
+                    '& > *': { fontSize: size === 'small' ? 20 : 24 }
+                  }}
+                >
+                  {icon}
+                </Box>
+              )}
+
+              {actions && (
+                <WidgetActions
+                  onRefresh={actions.onRefresh}
+                  onConfigure={actions.onConfigure}
+                  onExport={actions.onExport}
+                  onFullscreen={actions.onFullscreen}
+                  onRemove={actions.onRemove}
+                  widgetId={widgetId}
+                  widgetTitle={title}
+                  size={size === 'small' ? 'small' : 'medium'}
+                  showOnHover={true}
+                />
+              )}
+            </Stack>
           </Stack>
 
           {/* Main Value Section */}

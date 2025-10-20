@@ -38,6 +38,8 @@ import {
   ChartType,
   ChartFormat
 } from '@/lib/chart-utils';
+import { WidgetActionCallbacks } from "@/types/widget-actions";
+import { WidgetActions } from "./WidgetActions";
 
 /**
  * ChartCard Props Interface
@@ -54,6 +56,8 @@ type ChartCardProps = {
   showTooltip?: boolean;
   icon?: React.ReactNode;
   sx?: SxProps<Theme>;
+  actions?: WidgetActionCallbacks;
+  widgetId?: string;
 };
 
 /**
@@ -77,7 +81,9 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   showGrid = true,
   showTooltip = true,
   icon,
-  sx
+  sx,
+  actions,
+  widgetId
 }) => {
   const theme = useTheme();
 
@@ -273,11 +279,27 @@ export const ChartCard: React.FC<ChartCardProps> = ({
             <Typography variant="h6" component="h3" color="text.secondary">
               {title}
             </Typography>
-            {icon && (
-              <Box sx={{ color: 'primary.main'}}>
-                {icon}
-              </Box>
-            )}
+            <Stack direction="row" spacing={1} alignItems="center">
+              {icon && (
+                <Box sx={{ color: 'primary.main'}}>
+                  {icon}
+                </Box>
+              )}
+
+              {actions && (
+                <WidgetActions
+                  onRefresh={actions.onRefresh}
+                  onConfigure={actions.onConfigure}
+                  onExport={actions.onExport}
+                  onFullscreen={actions.onFullscreen}
+                  onRemove={actions.onRemove}
+                  widgetId={widgetId}
+                  widgetTitle={title}
+                  size="small"
+                  showOnHover={true}
+                />
+              )}
+            </Stack>
           </Stack>
 
           {/* Chart */}
