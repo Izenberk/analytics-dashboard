@@ -3,17 +3,18 @@
 import React from 'react';
 import { Box, Typography, Button, TextField } from '@mui/material';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
     const { signin } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const next = searchParams?.get('next') ? decodeURIComponent(searchParams.get('next')!) : '/dashboard';
     const [name, setName] = React.useState('Demo User');
 
     const handleLogin = async () => {
         await signin(name);
-        
-        router.replace('/dashboard');
+        router.replace(next);
     };
 
     return (

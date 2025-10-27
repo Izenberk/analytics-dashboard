@@ -1,19 +1,21 @@
 'use client';
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { CircularProgress, Box } from "@mui/material";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
 export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
 
     React.useEffect(() => {
         if (user === null) {
-            router.replace('/login');
+            const next = encodeURIComponent(pathname || '/');
+            router.replace(`/login?next=${next}`);
         }
-    }, [user, router]);
+    }, [user, router, pathname]);
 
     // If user is not present, show a spinner while redirect will happen.
     if (!user) {

@@ -4,7 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 import { AppBar, Toolbar, IconButton, Typography, Box, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useRouter } from 'next/navigation';
 import { useUiStore } from '@/lib/ui/useUiStore';
+import { useAuth } from '@/lib/auth/AuthProvider';
 
 /**
  * DesktopTopNav
@@ -13,6 +15,13 @@ import { useUiStore } from '@/lib/ui/useUiStore';
  */
 export const DesktopTopNav: React.FC = () => {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
+  const { user, signout } = useAuth();
+  const router = useRouter();
+
+  const handleSignout = async () => {
+    await signout();
+    router.replace('/login');
+  };
 
   return (
     <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -41,6 +50,23 @@ export const DesktopTopNav: React.FC = () => {
           <Link href="/dashboard"><Button component="span">Dashboard</Button></Link>
           <Link href="/reports"><Button component="span">Reports</Button></Link>
           <Link href="/settings"><Button component="span">Settings</Button></Link>
+
+          {user ? (
+            <>
+              <Typography variant="body2" sx={{ mx: 1, color: 'text.secondary' }}>
+                {user.name}
+              </Typography>
+              <Button variant="outlined" size="small" onClick={handleSignout}>
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <Link href="/login">
+              <Button variant="contained" size="small">
+                Login
+              </Button>
+            </Link>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
