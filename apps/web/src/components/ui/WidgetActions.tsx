@@ -1,6 +1,6 @@
 'use client';
 
-import React, { act } from 'react';
+import React from 'react';
 import {
   IconButton,
   Menu,
@@ -9,7 +9,6 @@ import {
   ListItemText,
   Tooltip,
   Stack,
-  Fade,
 } from '@mui/material';
 import {
   MoreVert as MoreIcon,
@@ -30,7 +29,7 @@ export const WidgetActions: React.FC<WidgetActionProps> = ({
   onRemove,
   widgetId,
   widgetTitle = 'Widget',
-  showOnHover = true,
+  showOnHover = false, // default to visible (improves discoverability)
   size = 'small',
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -39,7 +38,12 @@ export const WidgetActions: React.FC<WidgetActionProps> = ({
 
   // Memoized action list
   const availableActions = React.useMemo(() => {
-    const actions = [];
+    const actions: Array<{
+      type: string;
+      label: string;
+      icon: React.ReactNode;
+      onClick: () => void;
+    }> = [];
 
     if (onRefresh) {
       actions.push({
@@ -112,11 +116,18 @@ export const WidgetActions: React.FC<WidgetActionProps> = ({
         timestamp: new Date().toISOString(),
       });
     }
-    
-    action.onClick();
+
+    try {
+      action.onClick();
+    } catch (err) {
+      // Keep UI responsive even if callback throws
+      console.error('Widget action handler threw:', err);
+    }
+
     handleClose();
   };
 
+  // Decide whether to show the icon: if showOnHover is true, only show on hover; otherwise always show.
   const shouldShow = !showOnHover || isHovered;
 
   return (
@@ -125,25 +136,25 @@ export const WidgetActions: React.FC<WidgetActionProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Fade in={shouldShow} timeout={200}>
-        <div>
-          <Tooltip title={`${widgetTitle} actions`}>
-            <IconButton
-              onClick={handleClick}
-              size={size}
-              sx={{
-                opacity: showOnHover ? (isHovered ? 1 : 0.3) : 1,
-                transition: 'opacity 0.2s ease',
-                '&:hover': { opacity: 1 },
-              }}
-              aria-label={`Actions for ${widgetTitle}`}
-            >
-              <MoreIcon fontSize={size === 'small' ? 'small' : 'medium'} />
-            </IconButton>
-          </Tooltip>
-        </div>
-      </Fade>
-      
+      <div>
+        <Tooltip title={`${widgetTitle} actions`}>
+          <IconButton
+            onClick={handleClick}
+            size={size}
+            sx={{
+              // Visible by default for better discovery. If showOnHover is true, slightly dim until hovered.
+              opacity: showOnHover ? (isHovered ? 1 : 0.9) : 1,
+              transition: 'transform 120ms ease, opacity 120ms ease',
+              transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+              '&:hover': { transform: 'scale(1.06)' },
+            }}
+            aria-label={`Actions for ${widgetTitle}`}
+          >
+            <MoreIcon fontSize={size === 'small' ? 'small' : 'medium'} />
+          </IconButton>
+        </Tooltip>
+      </div>
+
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -174,3 +185,5 @@ export const WidgetActions: React.FC<WidgetActionProps> = ({
     </Stack>
   );
 };
+
+export default WidgetActions;
