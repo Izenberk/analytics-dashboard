@@ -1,6 +1,5 @@
 'use client';
 
-// React and Next.js imports
 import React from 'react';
 
 // Internal component imports (organized by feature)
@@ -19,8 +18,6 @@ import { AsyncWidget } from '@/components/widgets/AsyncWidgets';
 // Presentational card
 import WidgetCard from '@/components/dashboard/WidgetCard';
 import WidgetConfigModal from '@/components/dashboard/WidgetConfigModal';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 /** small helper to humanize IDs -> "total-revenue" => "Total Revenue" */
 function humanizeId(id: string) {
@@ -29,8 +26,31 @@ function humanizeId(id: string) {
     .replace(/\b\w/g, (ch) => ch.toUpperCase());
 }
 
+/** Lightweight types to avoid `any` in maps */
+type MetricItem = {
+  id?: string;
+  title?: string;
+  value?: number;
+  previousValue?: number;
+  format?: string;
+  icon?: React.ReactNode;
+  [key: string]: unknown;
+};
+
+type ChartItem = {
+  id?: string;
+  title?: string;
+  data?: Array<{ label: string; value: number }>;
+  chartType?: string;
+  format?: string;
+  icon?: React.ReactNode;
+  [key: string]: unknown;
+};
+
 export default function DashboardPage() {
-  const { isMobile, isTablet, isDesktop } = useResponsiveGrid();
+  // invoke the responsive hook for internal behavior (don't destructure into unused vars)
+  useResponsiveGrid();
+
   const [configureWidgetId, setConfigureWidgetId] = React.useState<string | null>(null);
 
   const handleConfigureClick = (widgetId: string) => {
@@ -41,19 +61,29 @@ export default function DashboardPage() {
     setConfigureWidgetId(null);
   };
 
-  // Correct explicit mapping: bind widgetId -> dataset so title/data never get out of sync.
-  // NOTE: This follows the mockMetrics array order in mock-data: [Total Revenue, Conversion Rate, Active Users, Orders Today]
-  const metricMap: Record<string, any> = {
-    'total-revenue': mockMetrics[0],
-    'conversion-rate': mockMetrics[1],  // <-- correct: conversion is index 1
-    'active-users': mockMetrics[2],     // <-- correct: active users is index 2
-    'avg-order-value': mockMetrics[3],
-  };
+  // Cast mock arrays to typed arrays (unknown -> typed) to avoid implicit `any`
+  // and keep the page-level mapping strongly typed.
+  const metrics = mockMetrics as unknown as MetricItem[];
+  const charts = mockCharts as unknown as ChartItem[];
 
-  const chartMap: Record<string, any> = {
-    'revenue-chart': mockCharts[0],
-    'users-chart': mockCharts[1],
-  };
+  // Build maps from arrays (avoid index-coupling)
+  const metricMap: Record<string, MetricItem | undefined> = React.useMemo(
+    () => ({
+      'total-revenue': metrics[0],
+      'conversion-rate': metrics[1],
+      'active-users': metrics[2],
+      'avg-order-value': metrics[3],
+    }),
+    [metrics]
+  );
+
+  const chartMap: Record<string, ChartItem | undefined> = React.useMemo(
+    () => ({
+      'revenue-chart': charts[0],
+      'users-chart': charts[1],
+    }),
+    [charts]
+  );
 
   return (
     <DashboardLayout>
@@ -69,7 +99,7 @@ export default function DashboardPage() {
                 data={metricMap['total-revenue']}
                 icon={metricMap['total-revenue']?.icon}
                 size="medium"
-                showTitle={true}
+                showTitle={false}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
@@ -88,7 +118,7 @@ export default function DashboardPage() {
                 data={metricMap['conversion-rate']}
                 icon={metricMap['conversion-rate']?.icon}
                 size="medium"
-                showTitle={true}
+                showTitle={false}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
@@ -107,7 +137,7 @@ export default function DashboardPage() {
                 data={metricMap['active-users']}
                 icon={metricMap['active-users']?.icon}
                 size="medium"
-                showTitle={true}
+                showTitle={false}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
@@ -122,7 +152,7 @@ export default function DashboardPage() {
                 data={metricMap['avg-order-value']}
                 icon={metricMap['avg-order-value']?.icon}
                 size="medium"
-                showTitle={true}
+                showTitle={false}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
@@ -139,7 +169,7 @@ export default function DashboardPage() {
                 height="medium"
                 showGrid
                 showTooltip
-                showTitle={true}
+                showTitle={false}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
@@ -155,7 +185,7 @@ export default function DashboardPage() {
                 height="medium"
                 showGrid
                 showTooltip
-                showTitle={true}
+                showTitle={false}
               />
             </WidgetErrorBoundary>
           </WidgetCard>

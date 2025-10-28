@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react";
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -43,11 +43,12 @@ import { WidgetActions } from "./WidgetActions";
 
 /**
  * ChartCard Props Interface
- * Type-safe chart configuration with discriminated unions
+ * - title is optional so the presentational shell (WidgetCard) can own the header.
+ * - data, chartType and format remain required for chart rendering.
  */
-type ChartCardProps = {
-  title: string;
-  data: Array<{ label: string; value: number }>;
+export type ChartCardProps = {
+  title?: string;
+  data: Array<{ label: string; value: number; trend?: string }>;
   chartType: ChartType;
   format: ChartFormat;
   loading?: boolean;
@@ -61,16 +62,15 @@ type ChartCardProps = {
 };
 
 /**
- * ChartCard Component
- *
- * Features:
- * - Multiple chart types (line, bar, area, pie)
- * - Responsive design with Recharts
- * - Loading states with proper skeletons
- * - Type-safe data formatting
- * - Theme integration
- * - Clean architecture with utility separation
+ * Recharts tooltip payload typing (small, conservative shape)
  */
+type RechartsPayloadItem = {
+  payload: {
+    formatted_value?: string;
+    value: number;
+  };
+};
+
 export const ChartCard: React.FC<ChartCardProps> = ({
   title,
   data,
@@ -88,8 +88,8 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   const theme = useTheme();
 
   // Process chart data using utility functions
-  const chartData = React.useMemo(() => {
-    if (loading || !data.length) return [];
+  const chartData: ChartDataPoint[] = React.useMemo(() => {
+    if (loading || !data || data.length === 0) return [];
     return processChartData(data, format);
   }, [data, format, loading]);
 
@@ -101,8 +101,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   };
 
   // Custom tooltip for better UX
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: RechartsPayloadItem[]; label?: string }) => {
     if (active && payload && payload.length) {
       return (
         <Box
@@ -119,7 +118,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
             {label}
           </Typography>
           <Typography variant="body1" color="primary.main" fontWeight="bold">
-            {payload[0].payload.formatted_value || formatChartValue(payload[0].value, format)}
+            {payload[0].payload.formatted_value ?? formatChartValue(payload[0].payload.value, format)}
           </Typography>
         </Box>
       );
@@ -167,11 +166,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
           <ResponsiveContainer width="100%" height={chartHeights[height]}>
             <LineChart {...commonProps}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />}
-              <XAxis
-                dataKey="name"
-                stroke={theme.palette.text.secondary}
-                fontSize={12}
-              />
+              <XAxis dataKey="name" stroke={theme.palette.text.secondary} fontSize={12} />
               <YAxis
                 stroke={theme.palette.text.secondary}
                 fontSize={12}
@@ -193,22 +188,14 @@ export const ChartCard: React.FC<ChartCardProps> = ({
           <ResponsiveContainer width="100%" height={chartHeights[height]}>
             <BarChart {...commonProps}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />}
-              <XAxis
-                dataKey="name"
-                stroke={theme.palette.text.secondary}
-                fontSize={12}
-              />
+              <XAxis dataKey="name" stroke={theme.palette.text.secondary} fontSize={12} />
               <YAxis
                 stroke={theme.palette.text.secondary}
                 fontSize={12}
                 tickFormatter={(value) => formatChartValue(value, format)}
               />
               {showTooltip && <Tooltip content={<CustomTooltip />} />}
-              <Bar
-                dataKey="value"
-                fill={theme.palette.primary.main}
-                radius={chartConfigs.bar.radius}
-              />
+              <Bar dataKey="value" fill={theme.palette.primary.main} radius={chartConfigs.bar.radius} />
             </BarChart>
           </ResponsiveContainer>
         );
@@ -218,11 +205,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
           <ResponsiveContainer width="100%" height={chartHeights[height]}>
             <AreaChart {...commonProps}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />}
-              <XAxis
-                dataKey="name"
-                stroke={theme.palette.text.secondary}
-                fontSize={12}
-              />
+              <XAxis dataKey="name" stroke={theme.palette.text.secondary} fontSize={12} />
               <YAxis
                 stroke={theme.palette.text.secondary}
                 fontSize={12}
@@ -245,20 +228,9 @@ export const ChartCard: React.FC<ChartCardProps> = ({
           <ResponsiveContainer width="100%" height={chartHeights[height]}>
             <PieChart>
               {showTooltip && <Tooltip content={<CustomTooltip />} />}
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={2}
-                dataKey="value"
-              >
+              <Pie data={chartData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={2} dataKey="value">
                 {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={getChartColor(entry.trend || 'neutral', format)}
-                  />
+                  <Cell key={`cell-${index}`} fill={getChartColor(entry.trend ?? 'neutral', format)} />
                 ))}
               </Pie>
             </PieChart>
@@ -274,33 +246,35 @@ export const ChartCard: React.FC<ChartCardProps> = ({
     <Card sx={{ height: '100%', ...sx }}>
       <CardContent sx={{ height: '100%' }}>
         <Stack spacing={2} height="100%">
-          {/* Header */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6" component="h3" color="text.secondary">
-              {title}
-            </Typography>
-            <Stack direction="row" spacing={1} alignItems="center">
-              {icon && (
-                <Box sx={{ color: 'primary.main'}}>
-                  {icon}
-                </Box>
-              )}
+          {/* Header: only render when title exists (WidgetCard can own header) */}
+          {title && (
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography variant="h6" component="h3" color="text.secondary">
+                {title}
+              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                {icon && (
+                  <Box sx={{ color: 'primary.main' }}>
+                    {icon}
+                  </Box>
+                )}
 
-              {actions && (
-                <WidgetActions
-                  onRefresh={actions.onRefresh}
-                  onConfigure={actions.onConfigure}
-                  onExport={actions.onExport}
-                  onFullscreen={actions.onFullscreen}
-                  onRemove={actions.onRemove}
-                  widgetId={widgetId}
-                  widgetTitle={title}
-                  size="small"
-                  showOnHover={true}
-                />
-              )}
+                {actions && (
+                  <WidgetActions
+                    onRefresh={actions.onRefresh}
+                    onConfigure={actions.onConfigure}
+                    onExport={actions.onExport}
+                    onFullscreen={actions.onFullscreen}
+                    onRemove={actions.onRemove}
+                    widgetId={widgetId}
+                    widgetTitle={title ?? widgetId ?? ''}
+                    size="small"
+                    showOnHover={true}
+                  />
+                )}
+              </Stack>
             </Stack>
-          </Stack>
+          )}
 
           {/* Chart */}
           <Box sx={{ flex: 1, minHeight: 0 }}>
