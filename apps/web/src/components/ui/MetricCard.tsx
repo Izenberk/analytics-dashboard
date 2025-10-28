@@ -25,9 +25,11 @@ import { WidgetActions } from "./WidgetActions";
 /**
  * MetricCard Props Interface
  * Using discriminated unions for type safety - prevents invalid format/value combinations
+ *
+ * Note: title is optional so the presentational shell (WidgetCard) can own the header.
  */
 type MetricCardProps = {
-  title: string;
+  title?: string; // optional now
   loading?: boolean;
   previousValue?: number;
   trend?: 'up' | 'down' | 'neutral' | 'auto';
@@ -76,8 +78,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 }) => {
   // Computed values using useMemo for performance
   const trendData = React.useMemo((): TrendCalculation | null => {
-    // Only calculate trend if we have previous value and trend is auto
-    if (!previousValue || trend !== 'auto') {
+    // Only calculate trend if we have previous value (allow 0) and trend is auto
+    if (previousValue == null || trend !== 'auto') {
       return null;
     }
 
@@ -163,48 +165,53 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     >
       <CardContent>
         <Stack spacing={2} height="100%">
-          {/* Header Section - Title, Icon, and Actions */}
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-            <Typography
-              variant="h6"
-              component="h3"
-              color="text.secondary"
-              sx={{
-                fontSize: size === 'small' ? '0.875rem' : '1rem',
-                fontWeight: 500
-              }}
-            >
-              {title}
-            </Typography>
+          {/* Header Section - Title, Icon, and Actions
+              Render only when `title` exists (WidgetCard usually owns header)
+          */}
+          {title && (
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+              <Typography
+                variant="h6"
+                component="h3"
+                color="text.secondary"
+                sx={{
+                  fontSize: size === 'small' ? '0.875rem' : '1rem',
+                  fontWeight: 500
+                }}
+              >
+                {title}
+              </Typography>
 
-            {/* Right section with icon and actions */}
-            <Stack direction="row" spacing={1} alignItems="center">
-              {icon && (
-                <Box
-                  sx={{
-                    color: 'primary.main',
-                    '& > *': { fontSize: size === 'small' ? 20 : 24 }
-                  }}
-                >
-                  {icon}
-                </Box>
-              )}
+              {/* Right section with icon and actions */}
+              <Stack direction="row" spacing={1} alignItems="center">
+                {icon && (
+                  <Box
+                    sx={{
+                      color: 'primary.main',
+                      '& > *': { fontSize: size === 'small' ? 20 : 24 }
+                    }}
+                  >
+                    {icon}
+                  </Box>
+                )}
 
-              {actions && (
-                <WidgetActions
-                  onRefresh={actions.onRefresh}
-                  onConfigure={actions.onConfigure}
-                  onExport={actions.onExport}
-                  onFullscreen={actions.onFullscreen}
-                  onRemove={actions.onRemove}
-                  widgetId={widgetId}
-                  widgetTitle={title}
-                  size={size === 'small' ? 'small' : 'medium'}
-                  showOnHover={true}
-                />
-              )}
+                {actions && (
+                  <WidgetActions
+                    onRefresh={actions.onRefresh}
+                    onConfigure={actions.onConfigure}
+                    onExport={actions.onExport}
+                    onFullscreen={actions.onFullscreen}
+                    onRemove={actions.onRemove}
+                    widgetId={widgetId}
+                    // ensure widgetTitle is always a string to satisfy WidgetActions' prop
+                    widgetTitle={title ?? widgetId ?? ''}
+                    size={size === 'small' ? 'small' : 'medium'}
+                    showOnHover={true}
+                  />
+                )}
+              </Stack>
             </Stack>
-          </Stack>
+          )}
 
           {/* Main Value Section */}
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
