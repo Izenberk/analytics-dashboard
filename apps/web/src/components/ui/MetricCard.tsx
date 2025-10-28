@@ -165,11 +165,13 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     >
       <CardContent>
         <Stack spacing={2} height="100%">
-          {/* Header Section - Title, Icon, and Actions
-              Render only when `title` exists (WidgetCard usually owns header)
+          {/* Header Section - Always render header container so actions are available.
+              Show title text only when provided; icon and actions render regardless.
+              This allows WidgetCard to own the textual header while keeping actions available.
           */}
-          {title && (
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+            {/* Left: title (conditionally rendered) */}
+            {title ? (
               <Typography
                 variant="h6"
                 component="h3"
@@ -181,37 +183,39 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               >
                 {title}
               </Typography>
+            ) : (
+              // keep left spacing consistent when title absent (use an empty Box)
+              <Box />
+            )}
 
-              {/* Right section with icon and actions */}
-              <Stack direction="row" spacing={1} alignItems="center">
-                {icon && (
-                  <Box
-                    sx={{
-                      color: 'primary.main',
-                      '& > *': { fontSize: size === 'small' ? 20 : 24 }
-                    }}
-                  >
-                    {icon}
-                  </Box>
-                )}
+            {/* Right section with icon and actions (always present if provided) */}
+            <Stack direction="row" spacing={1} alignItems="center">
+              {icon && (
+                <Box
+                  sx={{
+                    color: 'primary.main',
+                    '& > *': { fontSize: size === 'small' ? 20 : 24 }
+                  }}
+                >
+                  {icon}
+                </Box>
+              )}
 
-                {actions && (
-                  <WidgetActions
-                    onRefresh={actions.onRefresh}
-                    onConfigure={actions.onConfigure}
-                    onExport={actions.onExport}
-                    onFullscreen={actions.onFullscreen}
-                    onRemove={actions.onRemove}
-                    widgetId={widgetId}
-                    // ensure widgetTitle is always a string to satisfy WidgetActions' prop
-                    widgetTitle={title ?? widgetId ?? ''}
-                    size={size === 'small' ? 'small' : 'medium'}
-                    showOnHover={true}
-                  />
-                )}
-              </Stack>
+              {actions && (
+                <WidgetActions
+                  onRefresh={actions.onRefresh}
+                  onConfigure={actions.onConfigure}
+                  onExport={actions.onExport}
+                  onFullscreen={actions.onFullscreen}
+                  onRemove={actions.onRemove}
+                  widgetId={widgetId}
+                  widgetTitle={title ?? widgetId ?? ''}
+                  size={size === 'small' ? 'small' : 'medium'}
+                  showOnHover={true}
+                />
+              )}
             </Stack>
-          )}
+          </Stack>
 
           {/* Main Value Section */}
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
