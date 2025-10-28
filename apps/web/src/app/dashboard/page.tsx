@@ -18,14 +18,9 @@ import { AsyncWidget } from '@/components/widgets/AsyncWidgets';
 
 // Presentational card
 import WidgetCard from '@/components/dashboard/WidgetCard';
+import WidgetConfigModal from '@/components/dashboard/WidgetConfigModal';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 
 /** small helper to humanize IDs -> "total-revenue" => "Total Revenue" */
 function humanizeId(id: string) {
@@ -46,140 +41,128 @@ export default function DashboardPage() {
     setConfigureWidgetId(null);
   };
 
+  // Correct explicit mapping: bind widgetId -> dataset so title/data never get out of sync.
+  // NOTE: This follows the mockMetrics array order in mock-data: [Total Revenue, Conversion Rate, Active Users, Orders Today]
+  const metricMap: Record<string, any> = {
+    'total-revenue': mockMetrics[0],
+    'conversion-rate': mockMetrics[1],  // <-- correct: conversion is index 1
+    'active-users': mockMetrics[2],     // <-- correct: active users is index 2
+    'avg-order-value': mockMetrics[3],
+  };
+
+  const chartMap: Record<string, any> = {
+    'revenue-chart': mockCharts[0],
+    'users-chart': mockCharts[1],
+  };
+
   return (
     <DashboardLayout>
       <DashboardHeader />
 
       <DashboardGrid>
-        {/* 1. Total Revenue - Async Financial KPI */}
+        {/* 1. Total Revenue */}
         <WidgetArea gridArea="metric1" mobileOrder={1}>
           <WidgetCard id="total-revenue" title={humanizeId('total-revenue')} onConfigureClick={handleConfigureClick}>
-            <WidgetErrorBoundary 
-              widgetId="total-revenue" 
-              widgetType="metric"
-              onError={WidgetErrorHandler.createMetricErrorHandler('total-revenue')}
-            >
-              <AsyncWidget.Metric 
+            <WidgetErrorBoundary widgetId="total-revenue" widgetType="metric" onError={WidgetErrorHandler.createMetricErrorHandler('total-revenue')}>
+              <AsyncWidget.Metric
                 widgetId="total-revenue"
-                icon={mockMetrics[0]?.icon}
+                data={metricMap['total-revenue']}
+                icon={metricMap['total-revenue']?.icon}
                 size="medium"
+                showTitle={true}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
         </WidgetArea>
 
-        {/* 2. Active Users - Async User Analytics KPI */}
+        {/* 2. Conversion Rate */}
         <WidgetArea gridArea="metric2" mobileOrder={2}>
           <WidgetCard id="conversion-rate" title={humanizeId('conversion-rate')} onConfigureClick={handleConfigureClick}>
-            <WidgetErrorBoundary 
-              widgetId="active-users" 
-              widgetType="metric"
-              onError={WidgetErrorHandler.createMetricErrorHandler('active-users')}
-            >
-              <AsyncWidget.Metric 
-                widgetId="active-users"
-                icon={mockMetrics[1]?.icon}
-                size="medium"
-              />
-            </WidgetErrorBoundary>
-          </WidgetCard>
-        </WidgetArea>
-
-        {/* 3. Conversion Rate - Async Performance KPI */}
-        <WidgetArea gridArea="metric3" mobileOrder={3}>
-          <WidgetCard id="active-users" title={humanizeId('active-users')} onConfigureClick={handleConfigureClick}>
-            <WidgetErrorBoundary 
-              widgetId="conversion-rate" 
+            <WidgetErrorBoundary
+              widgetId="conversion-rate"
               widgetType="metric"
               onError={WidgetErrorHandler.createMetricErrorHandler('conversion-rate')}
             >
-              <AsyncWidget.Metric 
+              <AsyncWidget.Metric
                 widgetId="conversion-rate"
-                icon={mockMetrics[2]?.icon}
+                data={metricMap['conversion-rate']}
+                icon={metricMap['conversion-rate']?.icon}
                 size="medium"
+                showTitle={true}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
         </WidgetArea>
 
-        {/* 4. Average Order Value - Async Business KPI */}
+        {/* 3. Active Users */}
+        <WidgetArea gridArea="metric3" mobileOrder={3}>
+          <WidgetCard id="active-users" title={humanizeId('active-users')} onConfigureClick={handleConfigureClick}>
+            <WidgetErrorBoundary
+              widgetId="active-users"
+              widgetType="metric"
+              onError={WidgetErrorHandler.createMetricErrorHandler('active-users')}
+            >
+              <AsyncWidget.Metric
+                widgetId="active-users"
+                data={metricMap['active-users']}
+                icon={metricMap['active-users']?.icon}
+                size="medium"
+                showTitle={true}
+              />
+            </WidgetErrorBoundary>
+          </WidgetCard>
+        </WidgetArea>
+
+        {/* 4. Average Order Value */}
         <WidgetArea gridArea="metric4" mobileOrder={4}>
           <WidgetCard id="avg-order-value" title={humanizeId('avg-order-value')} onConfigureClick={handleConfigureClick}>
-            <WidgetErrorBoundary 
-              widgetId="avg-order-value" 
-              widgetType="metric"
-              onError={WidgetErrorHandler.createMetricErrorHandler('avg-order-value')}
-            >
-              <AsyncWidget.Metric 
+            <WidgetErrorBoundary widgetId="avg-order-value" widgetType="metric" onError={WidgetErrorHandler.createMetricErrorHandler('avg-order-value')}>
+              <AsyncWidget.Metric
                 widgetId="avg-order-value"
-                icon={mockMetrics[3]?.icon}
+                data={metricMap['avg-order-value']}
+                icon={metricMap['avg-order-value']?.icon}
                 size="medium"
+                showTitle={true}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
         </WidgetArea>
 
-        {/* Chart widgets with specialized error handling */}
-        {/* 1. Revenue Chart - Async Financial Trend Analysis */}
+        {/* Charts */}
         <WidgetArea gridArea="chart1" mobileOrder={5}>
           <WidgetCard id="revenue-chart" title={humanizeId('revenue-chart')} onConfigureClick={handleConfigureClick}>
-            <WidgetErrorBoundary 
-              widgetId="revenue-chart" 
-              widgetType="chart"
-              maxRetries={2}
-              onError={WidgetErrorHandler.createChartErrorHandler('revenue-chart', 'revenue-trends')}
-            >
-              <AsyncWidget.Chart 
+            <WidgetErrorBoundary widgetId="revenue-chart" widgetType="chart" maxRetries={2} onError={WidgetErrorHandler.createChartErrorHandler('revenue-chart', 'revenue-trends')}>
+              <AsyncWidget.Chart
                 widgetId="revenue-chart"
-                icon={mockCharts[0]?.icon}
+                data={chartMap['revenue-chart']}
+                icon={chartMap['revenue-chart']?.icon}
                 height="medium"
-                showGrid={true}
-                showTooltip={true}
+                showGrid
+                showTooltip
+                showTitle={true}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
         </WidgetArea>
 
-        {/* 2. Users Chart - Async User Growth Analysis */}
         <WidgetArea gridArea="chart2" mobileOrder={6}>
           <WidgetCard id="users-chart" title={humanizeId('users-chart')} onConfigureClick={handleConfigureClick}>
-            <WidgetErrorBoundary 
-              widgetId="users-chart" 
-              widgetType="chart"
-              maxRetries={2}
-              onError={WidgetErrorHandler.createChartErrorHandler('users-chart', 'user-analytics')}
-            >
-              <AsyncWidget.Chart 
+            <WidgetErrorBoundary widgetId="users-chart" widgetType="chart" maxRetries={2} onError={WidgetErrorHandler.createChartErrorHandler('users-chart', 'user-analytics')}>
+              <AsyncWidget.Chart
                 widgetId="users-chart"
-                icon={mockCharts[1]?.icon}
+                data={chartMap['users-chart']}
+                icon={chartMap['users-chart']?.icon}
                 height="medium"
-                showGrid={true}
-                showTooltip={true}
+                showGrid
+                showTooltip
+                showTitle={true}
               />
             </WidgetErrorBoundary>
           </WidgetCard>
         </WidgetArea>
       </DashboardGrid>
 
-      {/* Simple placeholder config dialog — later replace with WidgetConfigModal */}
-      <Dialog open={Boolean(configureWidgetId)} onClose={handleCloseConfig} fullWidth maxWidth="sm">
-        <DialogTitle>Configure widget</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Configuration for widget: <strong>{configureWidgetId}</strong>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            This is a placeholder dialog. In the next step we will implement a form (title, refresh interval, visible)
-            and persist changes to the widget config store.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfig}>Close</Button>
-          <Button variant="contained" onClick={() => { /* Later: save changes */ handleCloseConfig(); }}>
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <WidgetConfigModal widgetId={configureWidgetId} open={Boolean(configureWidgetId)} onClose={handleCloseConfig} />
     </DashboardLayout>
   );
 }

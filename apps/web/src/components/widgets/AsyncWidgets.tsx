@@ -4,7 +4,6 @@ import React from "react";
 import { MetricCard } from '@/components/ui/MetricCard';
 import { ChartCard } from '@/components/ui/ChartCard';
 import { useMetricData, useChartData } from "@/hooks/useWidgetData";
-import { WidgetErrorHandler } from "@/lib/error-handling/WidgetErrorHandler";
 
 // Type definitions for container props
 interface AsyncWidgetProps {
@@ -14,6 +13,15 @@ interface AsyncWidgetProps {
 interface AsyncMetricWidgetProps extends AsyncWidgetProps {
   icon?: React.ReactNode;
   size?: 'small' | 'medium' | 'large';
+  /**
+   * Optional explicit data to render. When provided, this overrides hook data.
+   */
+  data?: any;
+  /**
+   * When false, the inner MetricCard will not receive a title prop.
+   * Use when a presentational shell (WidgetCard) renders the header.
+   */
+  showTitle?: boolean;
 }
 
 interface AsyncChartWidgetProps extends AsyncWidgetProps {
@@ -21,27 +29,35 @@ interface AsyncChartWidgetProps extends AsyncWidgetProps {
   height?: 'small' | 'medium' | 'large';
   showGrid?: boolean;
   showTooltip?: boolean;
+  data?: any;
+  showTitle?: boolean;
 }
 
 /**
  * Async Metric Widget Container
- * Handles async data loading for metric widgets
+ * Handles async data loading for metric widgets.
+ * - Accepts optional `data` override and `showTitle` flag.
  */
 export const AsyncMetricWidget: React.FC<AsyncMetricWidgetProps> = ({
   widgetId,
   icon,
-  size = 'medium'
+  size = 'medium',
+  data: overrideData,
+  showTitle = true,
 }) => {
   // Use async hook for data management
-  const { data, loading, error, refresh, lastUpdated } = useMetricData(widgetId);
+  const { data: fetchedData, loading, error, refresh } = useMetricData(widgetId);
 
-  // Error boundary integration
+  // Prefer explicit override data when provided by caller
+  const resolvedData = overrideData ?? fetchedData;
+
+  // Error boundary integration — rethrow to be caught by WidgetErrorBoundary
   if (error) {
     throw new Error(`Metric widget ${widgetId} failed to load: ${error}`);
   }
 
-  // Handle loading state gracefully
-  if (loading && !data) {
+  // Loading state
+  if (loading && !resolvedData) {
     return (
       <MetricCard
         title="Loading..."
@@ -54,32 +70,42 @@ export const AsyncMetricWidget: React.FC<AsyncMetricWidgetProps> = ({
     );
   }
 
-  // Handle missing data gracefully
-  if (!data) {
+  // Missing data — surface as an error so the error boundary can handle it
+  if (!resolvedData) {
     throw new Error(`No data available for metric widget: ${widgetId}`);
   }
 
-  // Render with async data and actions
+  // Separate title from the rest of the props so we can optionally omit it
+  const { title, ...restProps } = resolvedData;
+
   return (
     <MetricCard
-      {...data}
-      loading={loading} // Show loading during refresh
+      {...(showTitle ? { title } : {})}
+      {...restProps}
+      loading={loading}
       size={size}
       icon={icon}
       widgetId={widgetId}
       actions={{
         onRefresh: async () => {
-          console.log(`🔄 [${widgetId.toUpperCase()}] Refreshing metric data...`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`🔄 [${widgetId}] Refreshing metric data...`);
+          }
           await refresh();
-          console.log(`✅ [${widgetId.toUpperCase()}] Metric data refreshed at ${new Date().toLocaleTimeString()}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`✅ [${widgetId}] Metric data refreshed`);
+          }
         },
         onConfigure: () => {
-          console.log(`⚙️ [${widgetId.toUpperCase()}] Opening metric configuration...`);
-          // Future: Open configuration dialog
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`⚙️ [${widgetId}] Open configure (not implemented)`);
+          }
+          // Placeholder: dashboard page / WidgetCard should handle opening config modal
         },
         onExport: () => {
-          console.log(`📊 [${widgetId.toUpperCase()}] Exporting metric data...`);
-          // Future: Export functionality with actual data
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`📊 [${widgetId}] Export metric (not implemented)`);
+          }
         },
       }}
     />
@@ -88,25 +114,29 @@ export const AsyncMetricWidget: React.FC<AsyncMetricWidgetProps> = ({
 
 /**
  * Async Chart Widget Container
- * Handles async data loading for chart widgets
+ * Handles async data loading for chart widgets.
+ * - Accepts optional `data` override and `showTitle` flag.
  */
 export const AsyncChartWidget: React.FC<AsyncChartWidgetProps> = ({
   widgetId,
   icon,
   height = 'medium',
   showGrid = true,
-  showTooltip = true
+  showTooltip = true,
+  data: overrideData,
+  showTitle = true,
 }) => {
   // Use async hook for chart data
-  const { data, loading, error, refresh, lastUpdated } = useChartData(widgetId);
+  const { data: fetchedData, loading, error, refresh } = useChartData(widgetId);
 
-  // Error boundary integration
+  // Prefer explicit override data when provided
+  const resolvedData = overrideData ?? fetchedData;
+
   if (error) {
     throw new Error(`Chart widget ${widgetId} failed to load: ${error}`);
   }
 
-  // Handle loading state for charts
-  if (loading && !data) {
+  if (loading && !resolvedData) {
     return (
       <ChartCard
         title="Loading Chart..."
@@ -120,15 +150,16 @@ export const AsyncChartWidget: React.FC<AsyncChartWidgetProps> = ({
     );
   }
 
-  // Handle missing data
-  if (!data) {
+  if (!resolvedData) {
     throw new Error(`No data available for chart widget: ${widgetId}`);
   }
 
-  // Render with async data and enhanced actions
+  const { title, ...restChartProps } = resolvedData;
+
   return (
     <ChartCard
-      {...data}
+      {...(showTitle ? { title } : {})}
+      {...restChartProps}
       loading={loading}
       height={height}
       showGrid={showGrid}
@@ -137,21 +168,28 @@ export const AsyncChartWidget: React.FC<AsyncChartWidgetProps> = ({
       widgetId={widgetId}
       actions={{
         onRefresh: async () => {
-          console.log(`🔄 [${widgetId.toUpperCase()}] Refreshing chart data...`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`🔄 [${widgetId}] Refreshing chart data...`);
+          }
           await refresh();
-          console.log(`✅ [${widgetId.toUpperCase()}] Chart data refreshed at ${new Date().toLocaleTimeString()}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`✅ [${widgetId}] Chart data refreshed`);
+          }
         },
         onConfigure: () => {
-          console.log(`⚙️ [${widgetId.toUpperCase()}] Opening chart configuration...`);
-          // Future: Chart configuration dialog
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`⚙️ [${widgetId}] Open chart configure (not implemented)`);
+          }
         },
         onFullscreen: () => {
-          console.log(`🖥️ [${widgetId.toUpperCase()}] Opening fullscreen chart view...`);
-          // Future: Fullscreen chart modal
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`🖥️ [${widgetId}] Open fullscreen (not implemented)`);
+          }
         },
         onExport: () => {
-          console.log(`📈 [${widgetId.toUpperCase()}] Exporting chart...`);
-          // Future: Export chart image and data
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`📈 [${widgetId}] Export chart (not implemented)`);
+          }
         },
       }}
     />
@@ -160,7 +198,6 @@ export const AsyncChartWidget: React.FC<AsyncChartWidgetProps> = ({
 
 /**
  * Widget factory for easy dashboard integration
- * Provides convenient way to create async widgets with consistent patterns
  */
 export const AsyncWidget = {
   Metric: AsyncMetricWidget,

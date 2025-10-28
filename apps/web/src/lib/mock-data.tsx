@@ -8,9 +8,10 @@
 import { AttachMoney, People, ShoppingCart, ShowChart, Timeline, TrendingUp } from "@mui/icons-material";
 import { BarChart } from "recharts";
 
-// MetricCard test data
+// MetricCard test data (now includes stable `id` fields)
 export const mockMetrics = [
   {
+    id: 'total-revenue',
     title: "Total Revenue",
     value: 125000,
     previousValue: 112000,
@@ -18,6 +19,7 @@ export const mockMetrics = [
     icon: <AttachMoney />
   },
   {
+    id: 'conversion-rate',
     title: "Conversion Rate",
     value: 3.2,
     previousValue: 2.8,
@@ -25,6 +27,7 @@ export const mockMetrics = [
     icon: <TrendingUp />
   },
   {
+    id: 'active-users',
     title: "Active Users",
     value: 8420,
     previousValue: 8100,
@@ -32,6 +35,7 @@ export const mockMetrics = [
     icon: <People />
   },
   {
+    id: 'orders-today',
     title: "Orders Today",
     value: 89,
     format: "number" as const,
@@ -64,9 +68,10 @@ export const mockChartData = {
   ]
 };
 
-// Chart configurations
+// Chart configurations (include stable ids)
 export const mockCharts = [
   {
+    id: 'revenue-chart',
     title: "Revenue Trend",
     data: mockChartData.revenue,
     chartType: "line" as const,
@@ -74,6 +79,7 @@ export const mockCharts = [
     icon: <ShowChart />
   },
   {
+    id: 'users-chart',
     title: "User Growth",
     data: mockChartData.users,
     chartType: "bar" as const,
@@ -81,6 +87,7 @@ export const mockCharts = [
     icon: <BarChart />
   },
   {
+    id: 'conversion-chart',
     title: "Conversion Rate",
     data: mockChartData.conversion,
     chartType: "area" as const,
@@ -88,6 +95,7 @@ export const mockCharts = [
     icon: <Timeline />
   },
   {
+    id: 'revenue-distribution',
     title: "Revenue Distribution",
     data: mockChartData.revenue.slice(0, 4),
     chartType: "pie" as const,
